@@ -39,7 +39,8 @@ and optionally remove the modeline from view.")
 (defcustom minibuffer-stats-format nil
   "Specification of the contents of the minibuffer-line.
 Uses the same format and defaults to `mode-line-format'."
-  :type 'sexp)
+  :type 'sexp
+  :group 'minibuffer-stats)
 
 (defun minibuffer-stats-function ()
   "The function to be called, it must return something which can be inserted such as a string."
@@ -47,15 +48,18 @@ Uses the same format and defaults to `mode-line-format'."
 
 (defcustom minibuffer-stats-refresh-interval 1
   "The frequency at which the minibuffer-stats is updated, in seconds."
-  :type 'integer)
+  :type 'integer
+  :group 'minibuffer-stats)
 
 (defcustom minibuffer-stats-zap-mode-line t
   "If the mode-line should be zapped."
-  :type 'boolean)
+  :type 'boolean
+  :group 'minibuffer-stats)
 
 (defcustom minibuffer-stats-mode-line-height 0.5
   "The height of the minimized minibuffer."
-  :type 'float)
+  :type 'float
+  :group 'minibuffer-stats)
 
 (defface minibuffer-stats-mode-line-active
   '((t (:inherit mode-line :background "#cc6666")))
@@ -87,37 +91,39 @@ Uses the same format and defaults to `mode-line-format'."
   "Display status info in the minibuffer window."
   :global t
   :group 'minibuffer-stats
+  :lighter " MiniBuff"
   (with-current-buffer minibuffer-stats--buffer
     (erase-buffer))
   ;; Turn off
-  (when minibuffer-stats--timer
-    (when minibuffer-stats--zapped-mode-line
-      (copy-face 'minibuffer-stats--old-mode-line 'mode-line)
-      (copy-face 'minibuffer-stats--old-mode-line-inactive 'mode-line-inactive)
-      (setq minibuffer-stats--zapped-mode-line nil)
-      (when minibuffer-stats--old-format
-	(setq-default mode-line-format minibuffer-stats--old-format)))
-    (cancel-timer minibuffer-stats--timer)
-    (setq minibuffer-stats--timer nil))
-  ;; Turn on
-  (when minibuffer-stats-mode
-    (when minibuffer-stats-zap-mode-line
-      (setq minibuffer-stats--zapped-mode-line t)
-      (copy-face 'mode-line 'minibuffer-stats--old-mode-line)
-      (copy-face 'mode-line-inactive 'minibuffer-stats--old-mode-line-inactive)
-      (copy-face 'minibuffer-stats-mode-line-active 'mode-line)
-      (copy-face 'minibuffer-stats-mode-line-inactive 'mode-line-inactive)
-      (set-face-attribute 'mode-line nil :height minibuffer-stats-mode-line-height)
-      (set-face-attribute 'mode-line-inactive nil :height minibuffer-stats-mode-line-height)
-      (unless minibuffer-stats--old-format
-	(setq minibuffer-stats-format mode-line-format)
-	(setq minibuffer-stats--old-format mode-line-format)
-	(setq-default mode-line-format ""))
-      )
-    (setq minibuffer-stats--timer
-          (run-with-timer t minibuffer-stats-refresh-interval
-                          #'minibuffer-stats--update))
-    (minibuffer-stats--update)))
+  (if minibuffer-stats-mode
+      (progn
+	(when minibuffer-stats--zapped-mode-line
+	  (copy-face 'minibuffer-stats--old-mode-line 'mode-line)
+	  (copy-face 'minibuffer-stats--old-mode-line-inactive 'mode-line-inactive)
+	  (setq minibuffer-stats--zapped-mode-line nil)
+	  (when minibuffer-stats--old-format
+	    (setq-default mode-line-format minibuffer-stats--old-format)))
+	(cancel-timer minibuffer-stats--timer)
+	(setq minibuffer-stats--timer nil))
+    ;; Turn on
+    (progn
+      (when minibuffer-stats-zap-mode-line
+	(setq minibuffer-stats--zapped-mode-line t)
+	(copy-face 'mode-line 'minibuffer-stats--old-mode-line)
+	(copy-face 'mode-line-inactive 'minibuffer-stats--old-mode-line-inactive)
+	(copy-face 'minibuffer-stats-mode-line-active 'mode-line)
+	(copy-face 'minibuffer-stats-mode-line-inactive 'mode-line-inactive)
+	(set-face-attribute 'mode-line nil :height minibuffer-stats-mode-line-height)
+	(set-face-attribute 'mode-line-inactive nil :height minibuffer-stats-mode-line-height)
+	(unless minibuffer-stats--old-format
+	  (setq minibuffer-stats-format mode-line-format)
+	  (setq minibuffer-stats--old-format mode-line-format)
+	  (setq-default mode-line-format ""))
+	)
+      (setq minibuffer-stats--timer
+	    (run-with-timer t minibuffer-stats-refresh-interval
+			    #'minibuffer-stats--update))
+      (minibuffer-stats--update))))
 
 (provide 'minibuffer-stats)
 ;;; minibuffer-stats.el ends here
