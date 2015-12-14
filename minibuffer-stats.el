@@ -34,8 +34,7 @@
 
 (defgroup minibuffer-stats ()
   "Use the idle minibuffer window to display status information
-and optionally remove the modeline from view."
-  :group 'mode-line)
+and optionally remove the modeline from view.")
 
 (defcustom minibuffer-stats-format nil
   "Specification of the contents of the minibuffer-line.
@@ -87,6 +86,7 @@ Uses the same format and defaults to `mode-line-format'."
 (define-minor-mode minibuffer-stats-mode
   "Display status info in the minibuffer window."
   :global t
+  :group 'minibuffer-stats
   (with-current-buffer minibuffer-stats--buffer
     (erase-buffer))
   ;; Turn off
@@ -96,7 +96,7 @@ Uses the same format and defaults to `mode-line-format'."
       (copy-face 'minibuffer-stats--old-mode-line-inactive 'mode-line-inactive)
       (setq minibuffer-stats--zapped-mode-line nil)
       (when minibuffer-stats--old-format
-	(setq mode-line-format minibuffer-stats--old-format)))
+	(setq-default mode-line-format minibuffer-stats--old-format)))
     (cancel-timer minibuffer-stats--timer)
     (setq minibuffer-stats--timer nil))
   ;; Turn on
@@ -112,7 +112,7 @@ Uses the same format and defaults to `mode-line-format'."
       (unless minibuffer-stats--old-format
 	(setq minibuffer-stats-format mode-line-format)
 	(setq minibuffer-stats--old-format mode-line-format)
-	(setq mode-line-format ""))
+	(setq-default mode-line-format ""))
       )
     (setq minibuffer-stats--timer
           (run-with-timer t minibuffer-stats-refresh-interval
