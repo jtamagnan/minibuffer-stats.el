@@ -95,9 +95,8 @@ Uses the same format and defaults to `mode-line-format'."
   (with-current-buffer minibuffer-stats--buffer
     (erase-buffer))
   ;; Turn off
-  (if minibuffer-stats-mode
-      (progn
-	(when minibuffer-stats--zapped-mode-line
+  (when minibuffer-stats--timer
+    	(when minibuffer-stats--zapped-mode-line
 	  (copy-face 'minibuffer-stats--old-mode-line 'mode-line)
 	  (copy-face 'minibuffer-stats--old-mode-line-inactive 'mode-line-inactive)
 	  (setq minibuffer-stats--zapped-mode-line nil)
@@ -106,7 +105,7 @@ Uses the same format and defaults to `mode-line-format'."
 	(cancel-timer minibuffer-stats--timer)
 	(setq minibuffer-stats--timer nil))
     ;; Turn on
-    (progn
+    (when (not minibuffer-stats--timer)
       (when minibuffer-stats-zap-mode-line
 	(setq minibuffer-stats--zapped-mode-line t)
 	(copy-face 'mode-line 'minibuffer-stats--old-mode-line)
@@ -123,7 +122,7 @@ Uses the same format and defaults to `mode-line-format'."
       (setq minibuffer-stats--timer
 	    (run-with-timer t minibuffer-stats-refresh-interval
 			    #'minibuffer-stats--update))
-      (minibuffer-stats--update))))
+      (minibuffer-stats--update)))
 
 (provide 'minibuffer-stats)
 ;;; minibuffer-stats.el ends here
