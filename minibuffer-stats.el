@@ -34,7 +34,8 @@
 
 (defgroup minibuffer-stats ()
   "Use the idle minibuffer window to display status information
-and optionally remove the modeline from view.")
+and optionally remove the modeline from view."
+  :group 'minibuffer)
 
 (defcustom minibuffer-stats-format nil
   "Specification of the contents of the minibuffer-line.
